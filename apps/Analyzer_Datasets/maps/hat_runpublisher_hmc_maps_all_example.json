@@ -1,0 +1,601 @@
+{
+  "algorithm": {
+    "general": {
+      "title": "HMC Maps Publisher",
+      "web-site": "",
+      "source": "Python library developed by CIMA Research Foundation",
+      "history": "1.5.0 [20210903]",
+      "project-info": "HAT - Hydrological Analysis Tools",
+      "algorithm": "Maps publisher postprocessing tool"
+    },
+    "flags": {
+      "cleaning_static": true,
+      "cleaning_dynamic_registry": true,
+      "cleaning_dynamic_source": true,
+      "cleaning_dynamic_analysis": true,
+      "cleaning_dynamic_destination": true,
+      "cleaning_dynamic_tmp": true
+    },
+    "template": {
+      "data": {
+        "domain_name": "string_domain_name",
+        "map_name": "string_map_name",
+        "var_name": "string_var_name",
+        "var_level": "string_var_level",
+        "var_mode": "string_var_mode",
+        "var_temporal_window": "string_var_temporal_window"
+      },
+      "time": {
+        "maps_datetime_type_01": "%Y%m%d%H%M",
+        "maps_sub_path_type_01": "%Y/%m/%d/",
+        "maps_datetime_type_02": "%Y%m%d%H%M",
+        "maps_sub_path_type_02": "%Y/%m/%d/%H",
+        "maps_datetime_type_03": "%Y%m%d%H%M",
+        "maps_sub_path_type_03": "%Y/%m/%d/",
+        "maps_datetime_type_04": "%Y%m%d%H%M",
+        "maps_sub_path_type_04": "%Y/%m/%d/",
+        "maps_datetime_type_05": "%Y%m%d%H%M",
+        "maps_sub_path_type_05": "%Y/%m/%d/",
+        "maps_datetime_ancillary": "%Y%m%d%H%M",
+        "maps_sub_path_ancillary": "%Y/%m/%d/",
+        "maps_datetime_analysis": "%Y%m%d%H%M",
+        "maps_sub_path_analysis": "%Y/%m/%d/",
+        "registry_datetime": "%Y%m%d%H%M",
+        "registry_sub_path": "%Y/%m/%d/%H/",
+        "info_datetime": "%Y%m%d%H%M",
+        "info_sub_path": "%Y/%m/%d/%H/",
+        "datasets_datetime": "%Y%m%d%H%M",
+        "datasets_sub_path": "%Y/%m/%d/%H/",
+        "plot_datetime": "%Y%m%d%H%M",
+        "plot_sub_path": "%Y/%m/%d/%H/"
+      },
+      "registry":{
+        "tag_name" : "string_tag_name"
+      }
+    },
+    "info": {
+      "domain_name": "marche",
+      "variable_limits": {
+        "rain_data"  : [0, null],
+        "discharge_data":  [0, null],
+        "air_temperature_data":  [-30, 50],
+        "relative_humidity_data":  [0, 100],
+        "incoming_radiation_data":  [-100, 1200],
+        "land_surface_temperature_data":  [260, 320],
+        "wind_speed_data":  [0, 10],
+        "soil_moisture_data": [0, 1],
+        "snow_water_equivalent_data": [0, null],
+        "snow_melting_data": [0, null],
+        "snow_density_data": [100, 500]
+      },
+      "variable_units": {
+        "rain_data"  : "mm",
+        "discharge_data":  "m^3/s",
+        "air_temperature_data":  "C",
+        "relative_humidity_data":  "%",
+        "incoming_radiation_data":  "W/m^2",
+        "land_surface_temperature_data":  "K",
+        "wind_speed_data":  "m/s",
+        "soil_moisture_data": "-",
+        "snow_water_equivalent_data": "mm",
+        "snow_melting_data": "mm",
+        "snow_density_data": "kg/m^3"
+      }
+    }
+  },
+  "data": {
+    "static": {
+      "source": {
+        "terrain": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_static/gridded/",
+          "file_name": "marche.dem.txt"
+        },
+        "flow_directions": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_static/gridded/",
+          "file_name": "marche.pnt.txt"
+        },
+        "river_network": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_static/gridded/",
+          "file_name": "marche.choice.txt"
+        },
+        "table_graph_lut" : {
+  		  "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-dev/apps/Analyzer_Datasets/maps/",
+      	  "file_name": "table_graph_lut.json"
+      	},
+        "colormap": {
+          "cmap_rain": {"folder_name": null,  "file_name": "rain.cmap"},
+          "cmap_sm": {"folder_name": null, "file_name": "sm.cmap"},
+          "cmap_lst": {"folder_name": null, "file_name": "lst.cmap"},
+          "cmap_swe": {"folder_name": null, "file_name": "swe.cmap"},
+          "cmap_snow_melting": {"folder_name": null, "file_name": "snow_melting.cmap"},
+          "cmap_snow_density": {"folder_name": null, "file_name": "snow_density.cmap"}
+        }
+      },
+      "destination": {
+        "info": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_static/info/",
+          "file_name": "marche.info_maps.workspace"
+        }
+      }
+    },
+    "dynamic": {
+      "source": {
+        "maps_02": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/archive/weather_stations_realtime/{maps_sub_path_type_02}/gridded",
+          "file_name": "hmc.output-grid.{maps_datetime_type_02}.nc.gz",
+          "data_variables": {
+            "soil_moisture": {
+              "var_name_file": "SM", "var_name_data": "soil_moisture_data",
+              "var_description": "hmc output based on observed datasets",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "land_surface_temperature": {
+              "var_name_file": "LST", "var_name_data": "land_surface_temperature_data",
+              "var_description": "hmc output based on observed datasets",
+              "var_mode": "deterministic",  "var_n": 1
+            }
+          },
+          "data_time": {
+            "time_search_period": 24,
+            "time_search_frequency": "H",
+            "time_search_file": "all",
+            "time_search_reference": {"maps_sub_path_type_02": "time_run"}
+          }
+        },
+        "maps_05": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_dynamic/outcome/s3m/{maps_sub_path_type_05}/",
+          "file_name": "s3m.mod.{maps_datetime_type_05}.nc.gz",
+          "data_variables": {
+            "snow_water_equivalent": {
+              "var_name_file": "SWE", "var_name_data": "snow_water_equivalent_data",
+              "var_description": "s3m output based on observed datasets",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "snow_melting": {
+              "var_name_file": "MeltingS", "var_name_data": "snow_melting_data",
+              "var_description": "s3m output based on observed datasets",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "snow_density": {
+              "var_name_file": "RhoS", "var_name_data": "snow_density_data",
+              "var_description": "s3m output based on observed datasets",
+              "var_mode": "deterministic",  "var_n": 1
+            }
+          },
+          "data_time": {
+            "time_search_period": 24,
+            "time_search_frequency": "H",
+            "time_search_file": "all",
+            "time_search_reference": {"maps_sub_path_type_02": "time_run"}
+          }
+        },
+        "maps_01": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_dynamic/outcome/obs/weather_stations/{maps_sub_path_type_01}/",
+          "file_name": "ws.db.{maps_datetime_type_01}.nc.gz",
+          "data_variables": {
+            "rain": {
+              "var_name_file": "Rain", "var_name_data": "rain_data",
+              "var_description": "weather stations observations",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "air_temperature": {
+              "var_name_file": "Air_Temperature", "var_name_data": "air_temperature_data",
+              "var_description": "weather stations observations",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "relative_humidity": {
+              "var_name_file": "Relative_Humidity", "var_name_data": "relative_humidity_data",
+              "var_description": "weather stations observations",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "incoming_radiation": {
+              "var_name_file": "Incoming_Radiation", "var_name_data": "incoming_radiation_data",
+              "var_description": "weather stations observations",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "wind_speed": {
+              "var_name_file": "Wind", "var_name_data": "wind_speed_data",
+              "var_description": "weather stations observations",
+              "var_mode": "deterministic",  "var_n": 1
+            }
+          },
+          "data_time": {
+            "time_search_period": 24,
+            "time_search_frequency": "H",
+            "time_search_file": "all",
+            "time_search_reference": {"maps_sub_path_type_01": "time_period"}
+          }
+        },
+        "maps_03": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_dynamic/outcome/nwp/ecmwf0100/{maps_sub_path_type_03}/",
+          "file_name": "nwp.ecmwf0100.{maps_datetime_type_03}.nc.gz",
+          "data_variables": {
+            "rain": {
+              "var_name_file": "Rain", "var_name_data": "rain_data",
+              "var_description": "nwp ecmwf0100 forecast",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "air_temperature": {
+              "var_name_file": "Air_Temperature", "var_name_data": "air_temperature_data",
+              "var_description": "nwp ecmwf0100 forecast",
+              "var_mode": "deterministic",  "var_n": 1
+            }
+          },
+          "data_time": {
+            "time_search_period": 2,
+            "time_search_frequency": "D",
+            "time_search_file": "first",
+            "time_search_reference": {"maps_sub_path_type_03": "time_period"}
+          }
+        },
+        "maps_04": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/data/data_dynamic/outcome/nwp/lami-2i/{maps_sub_path_type_04}/",
+          "file_name": "nwp.ecmwf0100.{maps_datetime_type_04}.nc.gz",
+          "data_variables": {
+            "rain": {
+              "var_name_file": "Rain", "var_name_data": "rain_data",
+              "var_description": "nwp lami-2i forecast",
+              "var_mode": "deterministic",  "var_n": 1
+            },
+            "air_temperature": {
+              "var_name_file": "Air_Temperature", "var_name_data": "air_temperature_data",
+              "var_description": "nwp lami-2i forecast",
+              "var_mode": "deterministic",  "var_n": 1
+            }
+          },
+          "data_time": {
+            "time_search_period": 2,
+            "time_search_frequency": "D",
+            "time_search_file": "first",
+            "time_search_reference": {
+              "maps_sub_path_type_04": "time_period"
+            }
+          }
+        }
+      },
+      "ancillary": {
+        "raw" : {
+          "maps_02": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_hmc.raw"
+          },
+          "maps_05": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_mod_s3m.raw"
+          },
+          "maps_01": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_weather_stations.raw"
+          },
+          "maps_03": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_nwp_ecmwf0100.raw"
+          },
+          "maps_04": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_nwp_lami-2i.raw"
+          }
+        },
+        "group" : {
+          "maps_02": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_hmc.group"
+          },
+          "maps_05": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_mod_s3m.group"
+          },
+          "maps_01": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_weather_stations.group"
+          },
+          "maps_03": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_nwp_ecmwf0100.group"
+          },
+          "maps_04": {
+            "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+            "file_name": "maps.collections.{maps_datetime_ancillary}_ancillary_nwp_lami-2i.group"
+          }
+        }
+      },
+      "analysis" : {
+        "maps_02": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+          "file_name": "maps.collections.{maps_datetime_analysis}_analysis_hmc.workspace",
+          "analysis_variables": {
+            "soil_moisture" : {
+              "var_name_data": "soil_moisture_data",  "var_name_analysis": "soil_moisture_analysis",
+              "var_description": "hmc analysis",
+              "var_level": "soil", "var_mode": "instantaneous", "var_type": "modelled",
+              "var_temporal_window": ["last"], "var_direction_window": "left"
+            },
+            "land_surface_temperature" : {
+              "var_name_data": "land_surface_temperature_data", "var_name_analysis": "land_surface_temperature_analysis",
+              "var_description": "hmc analysis",
+              "var_level": "surface", "var_mode": "instantaneous", "var_type": "modelled",
+              "var_temporal_window": ["last"], "var_direction_window": "left"
+            }
+          }
+        },
+        "maps_05": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+          "file_name": "maps.collections.{maps_datetime_analysis}_analysis_s3m.workspace",
+          "analysis_variables": {
+            "snow_water_equivalent" : {
+              "var_name_data": "snow_water_equivalent_data", "var_name_analysis": "snow_water_equivalent_analysis",
+              "var_description": "s3m analysis",
+              "var_level": "surface", "var_mode": "instantaneous", "var_type": "modelled",
+              "var_temporal_window": ["last"], "var_direction_window": "left"
+            },
+            "snow_melting" : {
+              "var_name_data": "snow_melting_data",  "var_name_analysis": "snow_melting_analysis",
+              "var_description": "s3m analysis",
+              "var_level": "surface", "var_mode": "instantaneous", "var_type": "modelled",
+              "var_temporal_window": ["last"], "var_direction_window": "left"
+            },
+            "snow_density" : {
+              "var_name_data": "snow_density_data",  "var_name_analysis": "snow_density_analysis",
+              "var_description": "s3m analysis",
+              "var_level": "surface", "var_mode": "instantaneous", "var_type": "modelled",
+              "var_temporal_window": ["last"], "var_direction_window": "left"
+            }
+          }
+        },
+        "maps_01": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+          "file_name": "maps.collections.{maps_datetime_analysis}_analysis_weather_stations.workspace",
+          "analysis_variables": {
+            "rain" : {
+              "var_name_data": "rain_data", "var_name_analysis": "rain_analysis",
+              "var_description": "weather stations analysis",
+              "var_level": "surface", "var_mode": "accumulated", "var_type": "observed",
+              "var_temporal_window": ["3H","6H","12H","24H"], "var_direction_window": "left"
+            },
+            "air_temperature" : {
+              "var_name_data": "air_temperature_data", "var_name_analysis": "air_temperature_analysis",
+              "var_description": "weather stations analysis",
+              "var_level": "surface", "var_mode": "average", "var_type": "observed",
+              "var_temporal_window": ["3H","6H","12H","24H"], "var_direction_window": "left"
+            },
+            "incoming_radiation" : {
+              "var_name_data": "incoming_radiation_data", "var_name_analysis": "incoming_radiation_analysis",
+              "var_description": "weather stations analysis",
+              "var_level": "surface", "var_mode": "instantaneous", "var_type": "observed",
+              "var_temporal_window": ["last"], "var_direction_window": "left"
+            }
+          }
+        },
+        "maps_03": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+          "file_name": "maps.collections.{maps_datetime_analysis}_analysis_nwp_ecmwf0100.workspace",
+          "analysis_variables": {
+            "rain" : {
+              "var_name_data": "rain_data", "var_name_analysis": "rain_analysis",
+              "var_description": "nwp ecmwf0100 analysis",
+              "var_level": "surface", "var_mode": "accumulated", "var_type": "forecast",
+              "var_temporal_window": ["3H","6H","12H","24H"], "var_direction_window": "right"
+            },
+            "air_temperature" : {
+              "var_name_data": "air_temperature_data", "var_name_analysis": "air_temperature_analysis",
+              "var_description": "nwp ecmwf0100 analysis",
+              "var_level": "surface", "var_mode": "average", "var_type": "forecast",
+              "var_temporal_window": ["3H","6H","12H","24H"], "var_direction_window": "right"
+            }
+          }
+        },
+        "maps_04": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/ancillary/",
+          "file_name": "maps.collections.{maps_datetime_analysis}_analysis_nwp_lami-2i.workspace",
+          "analysis_variables": {
+            "rain" : {
+              "var_name_data": "rain_data",  "var_name_analysis": "rain_analysis",
+              "var_description": "nwp lami-2i analysis",
+              "var_level": "surface", "var_mode": "accumulated", "var_type": "forecast",
+              "var_temporal_window": ["3H","6H","12H","24H"], "var_direction_window": "right"
+            },
+            "air_temperature" : {
+              "var_name_data": "air_temperature_data", "var_name_analysis": "air_temperature_analysis",
+              "var_description": "nwp lami-2i analysis",
+              "var_level": "surface", "var_mode": "average", "var_type": "forecast",
+              "var_temporal_window": ["3H","6H","12H","24H"], "var_direction_window": "right"
+            }
+          }
+        }
+      },
+      "destination": {
+        "registry": {
+          "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/registry/{registry_sub_path}",
+          "file_name": "map_{registry_datetime}.csv"
+        },
+        "collections" : {
+          "info": {
+            "maps_02": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{info_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{info_datetime}.json"
+            },
+            "maps_05": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{info_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{info_datetime}.json"
+            },
+            "maps_01": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{info_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{info_datetime}.json"
+            },
+            "maps_03": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{info_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{info_datetime}.json"
+            },
+            "maps_04": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{info_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{info_datetime}.json"
+            }
+          },
+          "datasets": {
+            "maps_02": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{datasets_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{datasets_datetime}.workspace"
+            },
+            "maps_05": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{datasets_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{datasets_datetime}.workspace"
+            },
+            "maps_01": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{datasets_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{datasets_datetime}.workspace"
+            },
+            "maps_03": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{datasets_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{datasets_datetime}.workspace"
+            },
+            "maps_04": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{datasets_sub_path}",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{datasets_datetime}.workspace"
+            }
+          },
+          "plot": {
+            "maps_02": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{plot_sub_path}/",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{plot_datetime}.png",
+              "graph_variables": {
+                "soil_moisture": {
+                  "var_name_analysis": "soil_moisture_analysis", "var_name_graph": "hmc_sm",
+                  "var_description": "Instantaneous Soil Moisture - HMC",
+                  "var_color_map": "cmap_sm", "var_color_label": "soil moisture",
+                  "var_dpi": 160, "var_background": "stamen"
+                },
+                "land_surface_temperature": {
+                  "var_name_analysis": "land_surface_temperature_analysis", "var_name_graph": "hmc_lst",
+                  "var_description": "Instantaneous Land Surface Temperature - HMC",
+                  "var_color_map": "cmap_lst", "var_color_label": "land surface temperature",
+                  "var_dpi": 160, "var_background": "stamen"
+                }
+              },
+              "graph_fx": {
+                "fx_name": "plot_map_var",
+                "fx_map": "map_generic"
+              }
+            },
+            "maps_05": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{plot_sub_path}/",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{plot_datetime}.png",
+              "graph_variables": {
+                "snow_water_equivalent": {
+                  "var_name_analysis": "snow_water_equivalent_analysis", "var_name_graph": "s3m_swe",
+                  "var_description": "Snow Water Equivalent - S3M",
+                  "var_color_map": "cmap_swe", "var_color_label": "snow water equivalent",
+                  "var_dpi": 160, "var_background": "stamen"
+                },
+                "snow_melting": {
+                  "var_name_analysis": "snow_melting_analysis", "var_name_graph": "s3m_snow_melting",
+                  "var_description": "Snow Melting - S3M",
+                  "var_color_map": "cmap_snow_melting", "var_color_label": "snow melting",
+                  "var_dpi": 160, "var_background": "stamen"
+                },
+                "snow_density": {
+                  "var_name_analysis": "snow_density_analysis", "var_name_graph": "s3m_snow_density",
+                  "var_description": "Snow Density - S3M",
+                  "var_color_map": "cmap_snow_density", "var_color_label": "snow density",
+                  "var_dpi": 160, "var_background": "stamen"
+                }
+              },
+              "graph_fx": {
+                "fx_name": "plot_map_var",
+                "fx_map": "map_generic"
+              }
+            },
+            "maps_01": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{plot_sub_path}/",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{plot_datetime}.png",
+              "graph_variables": {
+                "rain": {
+                  "var_name_analysis": "rain_analysis", "var_name_graph": "weather_station_rain",
+                  "var_description": "Accumulated Rain - Weather Stations",
+                  "var_color_map": "cmap_rain", "var_color_label": "rain",
+                  "var_dpi": 160, "var_background": "stamen"
+                },
+                "air_temperature": {
+                  "var_name_analysis": "air_temperature_analysis", "var_name_graph": "weather_station_air_temperature",
+                  "var_description": "Average AirTemperature - Weather Stations",
+                  "var_color_map": "coolwarm", "var_color_label": "air temperature",
+                  "var_dpi": 160, "var_background": "stamen"
+                },
+                "incoming_radiation": {
+                  "var_name_analysis": "incoming_radiation_analysis", "var_name_graph": "weather_station_incoming_radiation",
+                  "var_description": "Instantaneous Incoming Radiation - Weather Stations",
+                  "var_color_map": null, "var_color_label": "incoming radiation",
+                  "var_dpi": 160, "var_background": "stamen"
+                }
+              },
+              "graph_fx": {
+                "fx_name": "plot_map_var",
+                "fx_map": "map_generic"
+              }
+            },
+            "maps_03": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{plot_sub_path}/",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{plot_datetime}.png",
+              "graph_variables": {
+                "rain": {
+                  "var_name_analysis": "rain_analysis", "var_name_graph": "nwp_ecmwf0100_rain",
+                  "var_description": "Accumulated Rain - NWP ECMWF0100",
+                  "var_color_map": "cmap_rain", "var_color_label": "rain",
+                  "var_dpi": 160, "var_background": "stamen"
+                },
+                "air_temperature": {
+                  "var_name_analysis": "air_temperature_analysis", "var_name_graph": "nwp_ecmwf0100_air_temperature",
+                  "var_description": "Average Air Temperature - NWP ECMWF0100",
+                  "var_color_map": "coolwarm", "var_color_label": "air temperature",
+                  "var_dpi": 160, "var_background": "stamen"
+                }
+              },
+              "graph_fx": {
+                "fx_name": "plot_map_var",
+                "fx_map": "map_generic"
+              }
+            },
+            "maps_04": {
+              "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/images/{var_name}/{var_level}/{plot_sub_path}/",
+              "file_name": "hat.map_{var_name}_{var_level}_{var_mode}_{var_temporal_window}.{plot_datetime}.png",
+              "graph_variables": {
+                "rain": {
+                  "var_name_analysis": "rain_analysis", "var_name_graph": "nwp_lami2i_rain",
+                  "var_description": "Accumulated Rain - NWP LAMI-2I",
+                  "var_color_map": "cmap_rain", "var_color_label": "rain",
+                  "var_dpi": 160, "var_background": "stamen"
+                },
+                "air_temperature": {
+                  "var_name_analysis": "air_temperature_analysis", "var_name_graph": "nwp_lami2i_air_temperature",
+                  "var_description": "Average Air Temperature - NWP LAMI-2I",
+                  "var_color_map": "coolwarm", "var_color_label": "air temperature",
+                  "var_dpi": 160, "var_background": "stamen"
+                }
+              },
+              "graph_fx": {
+                "fx_name": "plot_map_var",
+                "fx_map": "map_generic"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tmp": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/tmp/",
+    "file_name": null
+  },
+  "log": {
+    "folder_name": "/home/fabio/Desktop/PyCharm_Workspace/hat-ws/log/",
+    "file_name": "hat_runpublisher_hmc_maps.txt",
+    "file_history": true
+  },
+  "time": {
+    "time_run": null,
+    "time_start": null,
+    "time_end": null,
+    "time_period": 1,
+    "time_frequency": "H",
+    "time_rounding": "H"
+  }
+}
