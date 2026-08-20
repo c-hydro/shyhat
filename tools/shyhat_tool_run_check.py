@@ -4,6 +4,7 @@ import json
 import logging
 import netrc
 import os
+import re
 import smtplib
 import time
 from glob import glob
@@ -16,7 +17,7 @@ import pygsheets
 
 
 ALG_NAME = "SHYHAT - OPERATIONAL CHAIN AVAILABILITY AND RUN MONITOR"
-ALG_VERSION = "2.3.0"
+ALG_VERSION = "2.3.1"
 ALG_RELEASE = "2026-08-20"
 
 
@@ -439,6 +440,13 @@ def resolve_log_file(item, templates, reference_time):
 
 
 def build_problem_note(status, log_file):
+    """Return the most useful recent error message from a process log.
+
+    The log is inspected from the end so that the most recent failed attempt is
+    preferred. Administrative ERROR lines are skipped. If no meaningful
+    ERROR-level line is found, the function falls back to the final exception
+    line of a traceback.
+    """
     if status.startswith("OK"):
         return ""
     if not log_file:
@@ -446,15 +454,85 @@ def build_problem_note(status, log_file):
     if not os.path.isfile(log_file):
         return "LOG NOT FOUND at path: {}".format(log_file)
 
-    last_error = None
     with open(log_file, "r", errors="replace") as log_handle:
-        for line in log_handle:
-            if "ERROR" in line:
-                last_error = line.strip()
-    if last_error:
-        return last_error
-    return "No error found in log: {}".format(log_file)
+        lines = [line.rstrip() for line in log_handle if line.strip()]
 
+    for line in reversed(lines):
+        if "ERROR" not in line:
+            continue
+        message = extract_log_message(line)
+        if is_meaningful_error_message(message):
+            return message
+
+    for line in reversed(lines):
+        message = line.strip()
+        if looks_like_exception_line(message):
+            return message
+
+    return "No meaningful error found in log: {}".format(log_file)
+
+
+def extract_log_message(line):
+    """Strip common timestamp/logger prefixes while preserving the error text."""
+    patterns = [
+        r"^\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}(?:,\\d+)?\\s*-\\s*ERROR\\s*:\\s*",
+        r"^\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2}(?:,\\d+)?\\s+ERROR\\s+",
+    ]
+    message = line.strip()
+    for pattern in patterns:
+        message = re.sub(pattern, "", message, count=1)
+    return message.strip()
+
+
+def is_meaningful_error_message(message):
+    """Classify whether an ERROR log line carries an actionable cause."""
+    if not message:
+        return False
+
+    if re.fullmatch(r"[\\s=\\-_*]+", message):
+        return False
+
+    lower = message.lower()
+
+    housekeeping_patterns = [
+        r"^workflow ['\\\"].*['\\\"] failed$",
+        r"^section ['\\\"].*['\\\"] failed after .*$",
+        r"^end time\\s*:",
+        r"^execution time\\s*:",
+        r"^start time\\s*:",
+        r"^workflow section summary\\s*:?",
+        r"^total section time\\s*:",
+    ]
+    if any(re.search(pattern, lower) for pattern in housekeeping_patterns):
+        return False
+
+    if looks_like_exception_line(message):
+        return True
+
+    useful_tokens = [
+        "unable to",
+        "failed to",
+        "not found",
+        "timed out",
+        "timeout",
+        "connection refused",
+        "permission denied",
+        "invalid ",
+        "missing ",
+        "http ",
+        "status code",
+    ]
+    return any(token in lower for token in useful_tokens)
+
+
+def looks_like_exception_line(message):
+    """Return True for Python-style exception/error messages."""
+    return bool(
+        re.search(
+            r"(?:^|[\\s:])(?:[A-Za-z_][\\w.]*\\.)?[A-Za-z_]\\w*(?:Error|Exception)\\s*:",
+            message,
+        )
+    )
 
 def build_eta(time_run, eta):
     if not eta:
