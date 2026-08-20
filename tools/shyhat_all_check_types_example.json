@@ -1,0 +1,159 @@
+{
+  "algorithm": {
+    "flags": {
+      "public_check_spreadsheet": false,
+      "send_email": false
+    },
+    "general": {
+      "operational_chain_name": "SHYHAT Example - All Check Types"
+    },
+    "template": {
+      "sub_path_date": "%Y/%m/%d",
+      "sub_path_datetime": "%Y/%m/%d/%H00",
+      "file_long_datetime": "%Y%m%d%H%M",
+      "file_frc_datetime": "%Y%m%d%H",
+      "file_run_date": "%Y%m%d",
+      "file_lock_datetime": "%Y%m%d_%H",
+      "file_halfhour_datetime": "%Y%m%d%H%M"
+    }
+  },
+  "data": {
+    "dynamic": {
+      "models": {
+        "forecast_standard": {
+          "type": "forecast",
+          "actions": {
+            "check": true
+          },
+          "folder": "/share/example/forecast/{sub_path_datetime}",
+          "file_name": "{file_frc_datetime}_forecast.nc",
+          "full_name": "Forecast - standard ETA check",
+          "eta": "08:30",
+          "log_file": "/share/example/log/forecast_{file_long_datetime}.txt"
+        },
+        "forecast_with_variable_check": {
+          "type": "forecast",
+          "actions": {
+            "check": true
+          },
+          "folder": "/share/example/forecast/{sub_path_date}",
+          "file_name": "{file_run_date}0000_product.nc",
+          "full_name": "Forecast - ETA plus NetCDF variable count",
+          "eta": "10:00",
+          "number_of_vars": 6,
+          "log_file": "/share/example/log/product_{file_long_datetime}.txt"
+        },
+        "realtime_recent_only": {
+          "type": "realtime",
+          "actions": {
+            "check": true
+          },
+          "folder": "/share/example/obs/{sub_path_datetime}",
+          "file_name": "obs_{file_frc_datetime}.tif",
+          "full_name": "Realtime - latest datum within delay",
+          "search_period_hours": 6,
+          "log_file": "/share/example/log/obs_latest.txt"
+        },
+        "realtime_complete_hourly": {
+          "type": "realtime",
+          "actions": {
+            "check": true
+          },
+          "folder": "/share/example/satellite/hourly/{sub_path_datetime}",
+          "file_name": "sat_{file_frc_datetime}.tif",
+          "full_name": "Realtime - recent plus 24 h complete hourly history",
+          "search_period_hours": 6,
+          "availability_length_hours": 24,
+          "availability_step_minutes": 60,
+          "log_file": "/share/example/log/satellite_hourly.txt"
+        },
+        "realtime_complete_halfhourly": {
+          "type": "realtime",
+          "actions": {
+            "check": true
+          },
+          "folder": "/share/example/satellite/halfhourly/{sub_path_date}",
+          "file_name": "imerg_{file_halfhour_datetime}.tif",
+          "full_name": "Realtime - recent plus 24 h complete 30-min history",
+          "search_period_hours": 6,
+          "availability_length_hours": 24,
+          "availability_step_minutes": 30,
+          "log_file": "/share/example/log/satellite_halfhourly.txt"
+        },
+        "realtime_legacy_settings": {
+          "type": "realtime",
+          "actions": {
+            "check": false
+          },
+          "folder": "/share/example/legacy/{sub_path_datetime}",
+          "file_name": "legacy_{file_frc_datetime}.tif",
+          "full_name": "Realtime - legacy availability settings",
+          "search_period_hours": 6,
+          "availability_period_hours": 24,
+          "availability_step_hours": 1,
+          "log_file": "/share/example/log/legacy.txt"
+        }
+      },
+      "runs": {
+        "run_standard": {
+          "actions": {
+            "check": true
+          },
+          "full_name": "Run - current reference time",
+          "start_lock_file": "/share/example/lock/run_standard_{file_lock_datetime}_START.txt",
+          "end_lock_file": "/share/example/lock/run_standard_{file_lock_datetime}_END.txt",
+          "eta": "11:00",
+          "log_file": "/share/example/log/run_standard_{file_long_datetime}.txt"
+        },
+        "run_with_reference_delay": {
+          "actions": {
+            "check": true
+          },
+          "full_name": "Run - check delayed/historical reference",
+          "time_delay_h": 24,
+          "start_lock_file": "/share/example/lock/run_delayed_{file_lock_datetime}_START.txt",
+          "end_lock_file": "/share/example/lock/run_delayed_{file_lock_datetime}_END.txt",
+          "eta": "09:30",
+          "log_file": "/share/example/log/run_delayed_{file_long_datetime}.txt"
+        },
+        "run_recent_success": {
+          "actions": {
+            "check": true
+          },
+          "full_name": "Run - latest successful execution within delay",
+          "check_mode": "recent_success",
+          "end_lock_pattern": "/share/example/lock/sync_to_target_END.txt",
+          "hours_delay": 20,
+          "log_file": "/share/example/log/sync_to_target.txt"
+        }
+      },
+      "outcome": {
+        "check": {
+          "folder": "/share/example/report/{sub_path_date}",
+          "file_name": "shyhat_check_{file_lock_datetime}.txt",
+          "api_key": "/share/example/credentials/service_account.json",
+          "url": "https://docs.google.com/spreadsheets/d/EXAMPLE/edit",
+          "titles": {
+            "models": "PRODUCT AVAILABILITY",
+            "runs": "OPERATIONAL PROCESSES"
+          }
+        },
+        "email": {
+          "sender": "monitor@example.org",
+          "recipient": "operations@example.org",
+          "smtp_server": "smtp.example.org",
+          "smtp_port": 587,
+          "user": "",
+          "pwd": "",
+          "starttls": true,
+          "subject": "SHYHAT: operational chain recap",
+          "other_infos": "\n"
+        }
+      }
+    },
+    "log": {
+      "filename": "shyhat_run_check.txt",
+      "folder": "/share/example/log/shyhat"
+    }
+  }
+}
